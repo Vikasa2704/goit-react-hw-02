@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import Description from './components/Description/Description';
+import Options from './components/Options/Options';
+import Feedback from './components/Feedback/Feedback';
+// import Notification from './components/Notification/Notification';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const feedbackData = {
+  good: 0,
+  neutral: 0,
+  bad: 0,
+};
+
+const App = () => {
+  const [feedback, setFeedback] = useState(feedbackData);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const sumFeedback = Object.values(feedback).reduce((acc, value) => acc + value, 0);
+    setIsVisible(sumFeedback > 0);
+  }, [feedback]);
+
+  const updateFeedback = (feedbackType) => {
+    if (feedbackType === 'reset') {
+      setFeedback(feedbackData);
+    } else {
+      setFeedback({
+        ...feedback,
+        [feedbackType]: feedback[feedbackType] + 1,
+      });
+    }
+  };
+
+  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
+  const positiveFeedback = totalFeedback > 0 ? Math.round((feedback.good / totalFeedback) * 100) : 0;
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="App">
+      <Description />
+      <Options updateFeedback={updateFeedback} isVisible={isVisible} />
+      <Feedback feedback={feedback} totalFeedback={totalFeedback} positiveFeedback={positiveFeedback} />
+    </div>
+  );
+};
 
-export default App
+export default App;
