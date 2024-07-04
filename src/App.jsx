@@ -17,27 +17,21 @@ const getLsFeedbackData = () => {
 
 const App = () => {
   const [feedback, setFeedback] = useState(getLsFeedbackData);
-  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('feedback-data', JSON.stringify(feedback));
   }, [feedback]);
 
-  useEffect(() => {
-    const sumFeedback = Object.values(feedback).reduce((acc, value) => acc + value, 0);
-    setIsVisible(sumFeedback > 0);
-  }, [feedback]);
-
-  const updateFeedback = (feedbackType) => {
-    if (feedbackType === 'reset') {
-      setFeedback(feedbackData);
-    } else {
-      setFeedback({
+   const updateFeedback = (feedbackType) => {
+        setFeedback({
         ...feedback,
         [feedbackType]: feedback[feedbackType] + 1,
       });
-    }
-  };
+    };
+    const resetFeedback = () => {
+      setFeedback(feedbackData);
+    };
+  
 
   const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
   const positiveFeedback = totalFeedback ? Math.round((feedback.good / totalFeedback) * 100) : 0;
@@ -45,7 +39,7 @@ const App = () => {
   return (
     <>
       <Description />
-      <Options updateFeedback={updateFeedback} isVisible={isVisible} />
+      <Options updateFeedback={updateFeedback} resetFeedback={resetFeedback} totalFeedbackCount={totalFeedback}/>
       {totalFeedback ? (
         <Feedback
           feedback={feedback}
